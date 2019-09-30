@@ -50,14 +50,21 @@ class Deck:
 # print(f'{n1} - {n2}')
 # print(deck.cards[n1][n2].name)
 
-class Game:
-    def deal(self,player,computer):
-        deck = Deck()
-        c1 = deck.getRansomCard()
-        c2 = deck.getRansomCard()
-        handPlayer = pojos.Hand([c1, c2])
-        player.hand = handPlayer
-        c3 = deck.getRansomCard()
-        c4 = deck.getRansomCard()
+def deal(player):
+    deck = Deck()
+    c1 = deck.getRansomCard()
+    c2 = deck.getRansomCard()
+    playerHand = pojos.Hand()
+    playerHand.cards.append(c1)
+    playerHand.cards.append(c2)
+    player.hand = playerHand
 
-        print(c1.name)
+    # c3 = deck.getRansomCard()
+    # c4 = deck.getRansomCard()
+    # compHand = pojos.Hand()
+    # compHand.cards.append(c3)
+    # compHand.cards.append(c4)
+
+
+class Game:
+    pass

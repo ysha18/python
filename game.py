@@ -8,6 +8,6 @@ File that contains the game instructions
 # start game
 player = pojos.Player(name="Harold")
 
-game = init.Game()
-game.deal()
-
+game = init
+init.deal(player)
+print(player.hand.cards[1].name)

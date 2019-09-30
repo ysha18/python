@@ -20,10 +20,11 @@ class Hand:
 # Definition player
 class Player:
 
-    def __init__(self, name, hand):
+    hand = Hand()
+
+    def __init__(self, name):
         self.name = name
         self.bankroll = 1000
-        self.hand = hand
 
     def bet(self, amount):
         try:
