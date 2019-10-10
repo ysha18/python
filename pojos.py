@@ -4,7 +4,6 @@ import random
 Script to define the pojos
 """
 
-gameON = True
 
 # Definition card
 class Card:
@@ -57,7 +56,7 @@ def createSuit(suitName):
 
 class Hand:
 
-    def __int__(self,cards):
+    def __int__(self, cards):
         self.cards = cards
 
 
@@ -71,7 +70,7 @@ def calculateTotal(hand):
 
 class Player:
 
-    def __init__(self, name,hand,bet):
+    def __init__(self, name, hand, bet):
         self.name = name
         self.hand = hand
         self.bankroll = 1000
@@ -79,21 +78,23 @@ class Player:
 
     def placeBet(self, amount):
         try:
-            self.bet = amount
-            self.bankroll = self.bankroll - amount
+            if int(amount) > self.bankroll:
+                print("Not enough money to bet")
+                return -1
+            print("passed 1st step")
+            self.bet = int(amount)
+            self.bankroll = self.bankroll - int(amount)
             print(f'Amount left in bankroll: {self.bankroll}')
-        except:
+        except (ValueError,TypeError):
             print(f"Can't bet, there is an error")
+            return -2
 
-    def hit(self,deck):
-        print("Player hit")
+    def hit(self, deck):
+        print("\n---> Player hit")
         self.hand.append(deck.cards.pop())
         totalPlayer = calculateTotal(self.hand)
         if totalPlayer > 21:
-            gameON = False
-            return "BUST - GAME OVER"
-        else:
-            return "Total value is " + str(totalPlayer)
+            return -1
 
     def check(self):
         total = calculateTotal(self.hand)
@@ -113,4 +114,9 @@ class Computer:
     def __init__(self, hand):
         self.hand = hand
 
-
+    def hit(self, deck):
+        print("\n---> Computer hit")
+        self.hand.append(deck.cards.pop())
+        totalPlayer = calculateTotal(self.hand)
+        if totalPlayer > 21:
+            return -1

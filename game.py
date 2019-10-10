@@ -10,14 +10,32 @@ def deal(deck, player1, comp1):
     # Get player & comp hand
     for i in range(2):
         player1.hand.append(deck.cards.pop())
-    comp1.hand.append(deck.cards.pop())
+        comp1.hand.append(deck.cards.pop())
     # print(f'ZZZZZZZ {player1.hand[0].name} {comp1.hand[0].name})')
 
-    printGameStatus(player1, comp1)
+    printGameStatusCompHidden(player1, comp1)
 
 
 def printGameStatus(player1, comp1):
-    print("\n-- GAME STATUS --\n")
+    print("\n**************")
+    print("GAME STATUS")
+    print("**************")
+    print("- PLAYER HAND -")
+    for ph in player1.hand:
+        print(ph.name)
+
+    print("\n- COMPUTER HAND -")
+    for ph in comp1.hand:
+        print(ph.name)
+
+    print("\n- BET (Bankroll) -")
+    print(f'{player1.bet} ({player1.bankroll}) ')
+
+
+def printGameStatusCompHidden(player1, comp1):
+    print("\n**************")
+    print("GAME STATUS")
+    print("**************")
     print("- PLAYER HAND -")
     for ph in player1.hand:
         print(ph.name)
@@ -25,36 +43,90 @@ def printGameStatus(player1, comp1):
     print("\n- COMPUTER HAND -")
     print(f'{comp1.hand[0].name} - XX')
 
-    print("\n- BET -")
-    print(f'{player1.bet} ')
-
-    print("\n- BANKROLL -")
-    print(f'{player1.bankroll} ')
-    print("\n------------\n")
+    print("\n- Bet (Bankroll) -")
+    print(f'{player1.bet} ({player1.bankroll}) ')
 
 
-# start game
-print("\n**************************")
-print("*  LETS PLAY BLACKJACK     *")
-print("****************************\n")
+def playAgain(p1):
+    playagain = input(f"You got {p1.bankroll} in bank. Wanna play again (y/n) ? ")
+    if playagain == 'y':
+        g = Game()
+        p1.hand = []
+        g.start(p1)
 
-deck = pojos.Deck()
-p1 = pojos.Player('Harold', [], 0)
-c1 = pojos.Computer([])
-deal(deck, p1, c1)
 
-# Player bet
-playerbet = input("How much do you bet: ")
-p1.placeBet(int(playerbet))
-printGameStatus(p1, c1)
-
-# Choice of hit or check
-choice = 'y'
-while choice == 'y' or not pojos.gameON:
-    choice = input("Would you like to hit: ")
-    if choice == 'y':
-        print(p1.hit(deck))
+def computerTurn(p1, c1, deck, gameON):
+    print("--------------- COMPUTER TURN --------------------")
+    totalP1 = pojos.calculateTotal(p1.hand)
+    totalC1 = pojos.calculateTotal(c1.hand)
+    while totalC1 <= totalP1 and totalC1 < 21 and gameON:
         printGameStatus(p1, c1)
+        # computer hit
+        if c1.hit(deck) == -1:
+            gameON = False
+            printGameStatus(p1, c1)
+            p1.bankroll = p1.bankroll + 2*p1.bet
+            p1.bet = 0
+            print(f'---------   Computer Bust. THE WINNER IS {p1.name}. CONGRATS! ----------------')
+            playAgain(p1)
+            break
+        else:
+            totalC1 = pojos.calculateTotal(c1.hand)
     else:
-        print(p1.check())
-printGameStatus(p1, c1)
+        printGameStatus(p1, c1)
+        p1.bet = 0
+        print(f'---------   Computer wins, GG, go learn how to play! ----------------')
+        playAgain(p1)
+
+
+class Game:
+
+    def __init__(self):
+        pass
+
+    def start(self,p1):
+        # start game
+        if p1.bankroll == 0:
+            print("Go work, make money, and then come and play!")
+        else:
+            self.gameON = True
+            deck = pojos.Deck()
+            c1 = pojos.Computer([])
+            deal(deck, p1, c1)
+
+            # Player bet
+            while p1.placeBet(input("\nHow much do you bet: ")) in [-1,-2]:
+                print("Try again")
+            printGameStatusCompHidden(p1, c1)
+
+            # Choice of hit or check
+            while True:
+                choice = input("Would you like to hit? (y/n) ")
+
+                if choice not in ['y','n']:  # try again
+                    print("Try again")
+
+                if choice == 'n':  # check
+                    print(p1.check())
+                    break
+
+                if choice == 'y':
+                    if p1.hit(deck) == -1:
+                        self.gameON = False
+                        printGameStatusCompHidden(p1, c1)
+                        print("BUST!!!! GAME OVER!!! YOU LOSE, HAHAHA!")
+                        playAgain(p1)
+                        break
+                    else:
+                        printGameStatusCompHidden(p1, c1)
+
+            # Computer turn
+            if self.gameON:
+                computerTurn(p1, c1, deck, self.gameON)
+
+
+print("\n##########################")
+print("#  LETS PLAY BLACKJACK     #")
+print("##########################")
+g = Game()
+g.start(pojos.Player("Harold",[],0))
