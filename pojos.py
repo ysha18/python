@@ -81,24 +81,37 @@ class Player:
             if int(amount) > self.bankroll:
                 print("Not enough money to bet")
                 return -1
-            print("passed 1st step")
             self.bet = int(amount)
             self.bankroll = self.bankroll - int(amount)
             print(f'Amount left in bankroll: {self.bankroll}')
-        except (ValueError,TypeError):
+        except (ValueError, TypeError):
             print(f"Can't bet, there is an error")
             return -2
 
     def hit(self, deck):
         print("\n---> Player hit")
+        aces = []
         self.hand.append(deck.cards.pop())
         totalPlayer = calculateTotal(self.hand)
         if totalPlayer > 21:
             return -1
 
     def check(self):
-        total = calculateTotal(self.hand)
-        return "Total value is " + str(total)
+        aces = []
+        total = 0
+        for c in self.hand:
+            if c.value == 1:
+                aces.append(c)
+        if len(aces) == 1:
+            # calculate hand with ace.value = 11, if bust, get it back to value 1
+            aces[0].value = 11
+            total = calculateTotal(self.hand)
+            if total > 21:
+                aces[0].value = 1
+                total = calculateTotal(self.hand)
+        else:
+            total = calculateTotal(self.hand)
+        return total
 
 
 # testing Player class 
@@ -116,7 +129,21 @@ class Computer:
 
     def hit(self, deck):
         print("\n---> Computer hit")
+        aces = []
+        total = 0
         self.hand.append(deck.cards.pop())
-        totalPlayer = calculateTotal(self.hand)
-        if totalPlayer > 21:
+        for c in self.hand:
+            if c.value == 1:
+                aces.append(c)
+        if len(aces) == 1:
+            # calculate hand with ace.value = 11, if bust, get it back to value 1
+            aces[0].value = 11
+            total = calculateTotal(self.hand)
+            if total > 21:
+                aces[0].value = 1
+                total = calculateTotal(self.hand)
+        else:
+            total = calculateTotal(self.hand)
+
+        if total > 21:
             return -1

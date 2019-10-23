@@ -50,6 +50,7 @@ def printGameStatusCompHidden(player1, comp1):
 def playAgain(p1):
     playagain = input(f"You got {p1.bankroll} in bank. Wanna play again (y/n) ? ")
     if playagain == 'y':
+        print(chr(27) + "[2J")
         g = Game()
         p1.hand = []
         g.start(p1)
@@ -91,13 +92,13 @@ class Game:
         else:
             self.gameON = True
             deck = pojos.Deck()
+            # Player bet
+            while p1.placeBet(input(f"\nHow much do you bet: (upto {p1.bankroll}) ")) in [-1,-2]:
+                print("Try again")
+
+            # Deal
             c1 = pojos.Computer([])
             deal(deck, p1, c1)
-
-            # Player bet
-            while p1.placeBet(input("\nHow much do you bet: ")) in [-1,-2]:
-                print("Try again")
-            printGameStatusCompHidden(p1, c1)
 
             # Choice of hit or check
             while True:
@@ -107,7 +108,12 @@ class Game:
                     print("Try again")
 
                 if choice == 'n':  # check
-                    print(p1.check())
+                    total = p1.check()
+                    if total == 21:
+                        print(f'---------   Computer Bust. THE WINNER IS {p1.name}. CONGRATS! ----------------')
+                        playAgain(p1)
+                    else:
+                        print(f"Total value is {total}")
                     break
 
                 if choice == 'y':
@@ -124,7 +130,7 @@ class Game:
             if self.gameON:
                 computerTurn(p1, c1, deck, self.gameON)
 
-
+print(chr(27) + "[2J")
 print("\n##########################")
 print("#  LETS PLAY BLACKJACK     #")
 print("##########################")
