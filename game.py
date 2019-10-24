@@ -48,12 +48,18 @@ def printGameStatusCompHidden(player1, comp1):
 
 
 def playAgain(p1):
-    playagain = input(f"You got {p1.bankroll} in bank. Wanna play again (y/n) ? ")
-    if playagain == 'y':
-        print(chr(27) + "[2J")
-        g = Game()
-        p1.hand = []
-        g.start(p1)
+    while True:
+        playagain = input(f"You got {p1.bankroll} in bank. Wanna play again (y/n) ? ")
+        if playagain == 'y':
+            print(chr(27) + "[2J")
+            g = Game()
+            p1.hand = []
+            g.start(p1)
+            break
+        elif playagain == 'n':
+            break
+        else:
+            print("Try again")
 
 
 def computerTurn(p1, c1, deck, gameON):
@@ -110,6 +116,8 @@ class Game:
                 if choice == 'n':  # check
                     total = p1.check()
                     if total == 21:
+                        p1.bankroll = p1.bankroll + 2*p1.bet
+                        p1.bet = 0
                         print(f'---------   Computer Bust. THE WINNER IS {p1.name}. CONGRATS! ----------------')
                         playAgain(p1)
                     else:
@@ -129,6 +137,7 @@ class Game:
             # Computer turn
             if self.gameON:
                 computerTurn(p1, c1, deck, self.gameON)
+
 
 print(chr(27) + "[2J")
 print("\n##########################")
